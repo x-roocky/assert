@@ -1,3 +1,7 @@
+/**
+ * @brief 配置打开`1`或关闭`0`断言功能，默认等同于`NDEBUG`
+ * 
+ */
 #ifndef ASSERT_CONFIG_ENABLE
 #ifdef NDEBUG
 #define ASSERT_CONFIG_ENABLE        0
@@ -6,16 +10,28 @@
 #endif /* !NDEBUG */
 #endif /* ASSERT_CONFIG_ENABLE */
 
+/**
+ * @brief 配置断言格式化输出宏，默认`fprintf(stderr, ...)`
+ * 
+ */
 #ifndef ASSERT_CONFIG_PRINTF
 #include <stdio.h>
 #define ASSERT_CONFIG_PRINTF(...)   fprintf(stderr, __VA_ARGS__)
 #endif /* ASSERT_CONFIG_PRINTF */
 
+/**
+ * @brief 配置断言异常终止宏，默认`abort()`
+ * 
+ */
 #ifndef ASSERT_CONFIG_ABORT
 #include <stdlib.h>
 #define ASSERT_CONFIG_ABORT()       ((void)abort())
 #endif /* ASSERT_CONFIG_ABORT */
 
+/**
+ * @brief 定义断言信息记述宏，可重定义实现不同格式或介质记述
+ * 
+ */
 #ifndef ASSERT_CONFIG_TRACE
 #define ASSERT_CONFIG_TRACE(_prompt, ...)   do {                    \
     ASSERT_CONFIG_PRINTF("Assertion failed (%s) at <%s:%d:%s>: \"", \
@@ -25,24 +41,35 @@
 } while (0)
 #endif /* ASSERT_CONFIG_TRACE */
 
+/**
+ * @brief 定义断言检测宏，可重定义实现不同的检测流程
+ * 
+ */
 #ifndef ASSERT_CONFIG_CHECK
+#if ASSERT_CONFIG_ENABLE == 0
+#define ASSERT_CONFIG_CHECK(...)    ((void)0)
+#else /* ASSERT_CONFIG_ENABLE != 0 */
 #define ASSERT_CONFIG_CHECK(_e, ...)     do {                       \
     if (!(_e)) {                                                    \
         ASSERT_CONFIG_TRACE(#_e, __VA_ARGS__);                      \
         ASSERT_CONFIG_ABORT();                                      \
     }                                                               \
 } while (0)
+#endif /* ASSERT_CONFIG_ENABLE != 0 */
 #endif /* ASSERT_CONFIG_CHECK */
 
-#if ASSERT_CONFIG_ENABLE == 0
-#undef ASSERT_CONFIG_CHECK
-#define ASSERT_CONFIG_CHECK(...)    ((void)0)
-#endif /* ASSERT_CONFIG_ENABLE == 0 */
-
+/**
+ * @brief 扩展assert。既兼容标准assert，又支持格式化输出
+ * 
+ */
 #define __x_assert_1(e)         ASSERT_CONFIG_CHECK(e, "No message")
 #define __x_assert_n(e, ...)    ASSERT_CONFIG_CHECK(e, __VA_ARGS__)
 #define assert(...)             __X_ASSERT_O1(__x_assert_1, __x_assert_n, __VA_ARGS__)
 
+/**
+ * @brief 内部定义，外部禁用，用于实现根据不同数量参数的宏重载
+ * 
+ */
 #ifndef __X_ASSERT_H__
 #define __X_ASSERT_H__
 
