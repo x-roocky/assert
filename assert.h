@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, Roocky <wangxy@roocky.com>
+ * All rights reserved. 
+ *
+ */
+
 /**
  * @brief 配置打开`1`或关闭`0`断言功能，默认等同于`NDEBUG`
  * 
@@ -62,6 +68,9 @@
  * @brief 扩展assert。既兼容标准assert，又支持格式化输出
  * 
  */
+#undef __x_assert_1
+#undef __x_assert_n
+#undef assert
 #define __x_assert_1(e)         ASSERT_CONFIG_CHECK(e, "No message")
 #define __x_assert_n(e, ...)    ASSERT_CONFIG_CHECK(e, __VA_ARGS__)
 #define assert(...)             __X_ASSERT_O1(__x_assert_1, __x_assert_n, __VA_ARGS__)
